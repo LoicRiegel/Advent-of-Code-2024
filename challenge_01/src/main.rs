@@ -26,7 +26,7 @@ fn total_distance(two_lists: Vec<(u32, u32)>) -> u64 {
     let mut total_distance: u64 = 0;
     two_lists.into_iter().for_each(|entry| {
         let diff = entry.0.abs_diff(entry.1);
-        total_distance = total_distance + (diff as u64);
+        total_distance += diff as u64;
     });
     total_distance
 }
