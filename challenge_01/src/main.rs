@@ -24,16 +24,16 @@ fn read_input(filename: &str) -> Vec<(u32, u32)> {
     two_lists
 }
 
-fn total_distance(two_lists: &Vec<(u32, u32)>) -> u64 {
+fn total_distance(two_lists: &[(u32, u32)]) -> u64 {
     let mut total_distance: u64 = 0;
-    two_lists.into_iter().for_each(|entry| {
+    two_lists.iter().for_each(|entry| {
         let diff = entry.0.abs_diff(entry.1);
         total_distance += diff as u64;
     });
     total_distance
 }
 
-fn similarity_score(two_lists: &Vec<(u32, u32)>) -> usize {
+fn similarity_score(two_lists: &[(u32, u32)]) -> usize {
     let mut similqrity_score: usize = 0;
 
     let second_list_counter: Counter<u32> = two_lists
