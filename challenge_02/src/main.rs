@@ -29,6 +29,8 @@ trait Level {
     fn increasing(&self) -> Result<LevelIncrease, ()>;
 
     fn is_valid(&self) -> bool;
+
+    fn is_valid_with_problem_dampener(&self) -> bool;
 }
 
 impl Level for Vec<u8> {
@@ -64,18 +66,66 @@ impl Level for Vec<u8> {
 
         true
     }
+
+    fn is_valid_with_problem_dampener(&self) -> bool {
+        if self.is_valid() {
+            return true;
+        }
+        let sub_vectors_valid: Vec<bool> = self.iter().enumerate().fold(
+            Vec::default(), |mut acc, (idx, _)| {
+                let mut sub_vector = self.clone();
+                sub_vector.remove(idx);
+                acc.push(sub_vector.is_valid());
+                acc
+            }
+        );
+    
+        sub_vectors_valid.contains(&true)
+    }
 }
 
 fn main() {
     let reports = read_input(INPUT_FILE_NAME);
-    dbg!(&reports);
-
+    
     let valid_reports: Vec<Vec<u8>> = reports
         .clone()
         .into_iter()
         .filter(|entry| entry.is_valid())
         .collect();
-    dbg!(&valid_reports);
+    let valid_reports_with_problem_dampener: Vec<Vec<u8>> = reports
+        .clone()
+        .into_iter()
+        .filter(|entry| entry.is_valid_with_problem_dampener())
+        .collect();
+    
+    // dbg!(&reports);
+    // dbg!(&valid_reports);
+    // dbg!(&valid_reports_with_problem_dampener);
     dbg!(&reports.len());
     dbg!(&valid_reports.len());
+    dbg!(&valid_reports_with_problem_dampener.len());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(vec![3, 2, 1], true)]
+    #[case(vec![1, 2, 3], true)]
+    #[case(vec![1, 2, 0, 3], false)]
+    #[case(vec![1, 2, 2], false)]
+    #[case(vec![1, 2, 1], false)]
+    #[case(vec![2, 1, 2], false)]
+    fn test_is_valid(#[case] input: Vec<u8>, #[case] expected: bool) {
+        assert_eq!(input.is_valid(), expected);
+    }
+
+    #[rstest]
+    #[case(vec![1, 2, 9], true)]
+    #[case(vec![1, 2, 9, 10], false)]
+    fn test_is_valid_with_problem_dampener(#[case] input: Vec<u8>, #[case] expected: bool) {
+        assert_eq!(input.is_valid_with_problem_dampener(), expected);
+    }
 }
