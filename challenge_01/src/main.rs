@@ -1,4 +1,6 @@
-use std::{fs::read_to_string, iter::zip};
+use counter::Counter;
+use std::fs::read_to_string;
+use std::iter::zip;
 
 const INPUT_FILE_NAME: &str = "input.txt";
 
@@ -22,7 +24,7 @@ fn read_input(filename: &str) -> Vec<(u32, u32)> {
     two_lists
 }
 
-fn total_distance(two_lists: Vec<(u32, u32)>) -> u64 {
+fn total_distance(two_lists: &Vec<(u32, u32)>) -> u64 {
     let mut total_distance: u64 = 0;
     two_lists.into_iter().for_each(|entry| {
         let diff = entry.0.abs_diff(entry.1);
@@ -31,9 +33,27 @@ fn total_distance(two_lists: Vec<(u32, u32)>) -> u64 {
     total_distance
 }
 
+fn similarity_score(two_lists: &Vec<(u32, u32)>) -> usize {
+    let mut similqrity_score: usize = 0;
+
+    let second_list_counter: Counter<u32> = two_lists
+        .iter()
+        .map(|entry| entry.1)
+        .collect::<Counter<u32>>();
+
+    two_lists.iter().map(|entry| entry.0).for_each(|first_nb| {
+        let occurrences_in_second_list = second_list_counter.get(&first_nb).unwrap_or(&0);
+        similqrity_score += (first_nb as usize) * occurrences_in_second_list;
+    });
+
+    similqrity_score
+}
+
 fn main() {
     let two_lists = read_input(INPUT_FILE_NAME);
-    dbg!(&two_lists);
-    let total_distance = total_distance(two_lists);
+    //dbg!(&two_lists);
+    let total_distance = total_distance(&two_lists);
     dbg!(total_distance);
+    let similarity_score = similarity_score(&two_lists);
+    dbg!(similarity_score);
 }
